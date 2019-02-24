@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup Label="Common">
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+    <GenerateAssemblyInfo>True</GenerateAssemblyInfo>
+    <GenerateDocumentationFile>False</GenerateDocumentationFile>
+    <NoWarn>1701;1702;1705;1591</NoWarn>
+    <IsPackable>False</IsPackable>
+    <LangVersion>Latest</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Label="Package">
+    <ApplicationVersion>$(Version)</ApplicationVersion>
+    <VersionPrefix>1.2.1</VersionPrefix>
+    <PackageReleaseNotes>Full Sum&amp;Sub API support.</PackageReleaseNotes>
+    <VersionSuffix>$(VersionSuffix)</VersionSuffix>
+    <PackageOutputPath>$(SolutionDir).packages</PackageOutputPath>
+    <Description>Sum &amp; Substance API Client.</Description>
+    <Authors>Leonid Efremov</Authors>
+    <PackageVersion>$(Version)</PackageVersion>
+    <PackageTags>swagger;api;sumsub;</PackageTags>
+    <IncludeSymbols>False</IncludeSymbols>
+  </PropertyGroup>
+</Project>

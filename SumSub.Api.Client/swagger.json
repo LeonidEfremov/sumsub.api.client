@@ -1,0 +1,1139 @@
+﻿{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Sum&Substance API",
+    "description": "Sum&Substance’s API allows you to send and receive applicants data and documents for verification through simple RESTful APIs. API responds with JSON payload (unless otherwise stated). When data payload should be provided, it expects parameters to be passed in valid JSON (except when stated otherwise) with the Content-Type: application/json header being set.",
+    "version": "1.0.0",
+    "termsOfService": "https://sumsub.com/eng/security"
+  },
+  "servers": [
+    {
+      "url": "https://test-api.sumsub.com",
+      "description": "Developers Stage"
+    },
+    {
+      "url": "https://api.sumsub.com",
+      "description": "Production Stage"
+    }
+  ],
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "key",
+        "description": "API key for authentication"
+      }
+    },
+    "parameters": {
+      "applicantId": {
+        "in": "path",
+        "name": "applicantId",
+        "description": "Applicant Id",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "unsetFields": {
+        "name": "unsetFields",
+        "in": "query",
+        "description": "Comma-separated list of fields to unset",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      }
+    },
+    "schemas": {
+      "applicantRequest": {
+        "type": "object",
+        "required": [
+          "info"
+        ],
+        "properties": {
+          "externalUserId": {
+            "type": "string"
+          },
+          "sourceKey": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "lang": {
+            "type": "string"
+          },
+          "metadata": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/keyValue"
+            }
+          },
+          "requiredIdDocs": {
+            "$ref": "#/components/schemas/docSets"
+          },
+          "info": {
+            "$ref": "#/components/schemas/info"
+          }
+        }
+      },
+      "keyValue": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        }
+      },
+      "applicantResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "clientId": {
+            "type": "string"
+          },
+          "inspectionId": {
+            "type": "string"
+          },
+          "jobId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "externalUserId": {
+            "type": "string"
+          },
+          "info": {
+            "$ref": "#/components/schemas/info"
+          },
+          "env": {
+            "type": "string"
+          }
+        }
+      },
+      "info": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "middleName": {
+            "type": "string"
+          },
+          "legalName": {
+            "type": "string"
+          },
+          "gender": {
+            "type": "string",
+            "maxLength": 1,
+            "minLength": 1
+          },
+          "dob": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "placeOfBirth": {
+            "type": "string"
+          },
+          "countryOfBirth": {
+            "type": "string"
+          },
+          "stateOfBirth": {
+            "type": "string"
+          },
+          "country": {
+            "$ref": "#/components/schemas/countryCode"
+          },
+          "nationality": {
+            "$ref": "#/components/schemas/countryCode"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "mobilePhone": {
+            "type": "string"
+          },
+          "addresses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/address"
+            }
+          },
+          "cryptoWallets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/cryptoWallet"
+            }
+          }
+        }
+      },
+      "address": {
+        "type": "object",
+        "properties": {
+          "country": {
+            "$ref": "#/components/schemas/countryCode"
+          },
+          "postCode": {
+            "type": "string"
+          },
+          "town": {
+            "type": "string"
+          },
+          "street": {
+            "type": "string"
+          },
+          "subStreet": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "buildingName": {
+            "type": "string"
+          },
+          "flatNumber": {
+            "type": "string"
+          },
+          "buildingNumber": {
+            "type": "string"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      },
+      "cryptoWallet": {
+        "type": "object",
+        "required": [
+          "wallet",
+          "currency"
+        ],
+        "properties": {
+          "wallet": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          }
+        }
+      },
+      "idDocType": {
+        "type": "string",
+        "description": "* `ID_CARD` - An id card\n* `PASSPORT` - A passport\n* `DRIVERS` - A driving license\n* `BANK_CARD` - A bank card, like Visa or Maestro\n* `UTILITY_BILL` - A utility bill\n* `SNILS` - A Russian document (SNILS)\n* `SELFIE` - A selfie image (in this case no additional metadata should be sent)\n* `PROFILE_IMAGE` - A profile image, i.e. userpic (in this case no additional metadata should be sent)\n* `ID_DOC_PHOTO` - Photo from some id doc (like a photo from a passport) (No additional metadata should be sent)\n* `AGREEMENT` - Agreement of some sort, e.g. for processing personal info\n* `CONTRACT` - Some sort of contract\n* `RESIDENCE_PERMIT` - Residence permit or registration document in the foreign city/country\n* `EMPLOYMENT_CERTIFICATE` - A document from an employer, e.g. proof that a user works there\n* `DRIVERS_TRANSLATION` - Translation of the driving license required in the target country\n* `INVESTOR_DOC` - A document from an investor, e.g. documents which disclose assets of the investor\n* `VEHICLE_REGISTRATION_CERTIFICATE` - Certificate of vehicle registration\n* `OTHER` - Should be used only when nothing else applies\n",
+        "enum": [
+          "UNDEFINED",
+          "ID_CARD",
+          "PASSPORT",
+          "DRIVERS",
+          "BANK_CARD",
+          "UTILITY_BILL",
+          "SNILS",
+          "SELFIE",
+          "PROFILE_IMAGE",
+          "ID_DOC_PHOTO",
+          "AGREEMENT",
+          "CONTRACT",
+          "RESIDENCE_PERMIT",
+          "EMPLOYMENT_CERTIFICATE",
+          "DRIVERS_TRANSLATION",
+          "INVESTOR_DOC",
+          "VEHICLE_REGISTRATION_CERTIFICATE",
+          "OTHER"
+        ]
+      },
+      "idDocSetType": {
+        "type": "string",
+        "description": "* `IDENTITY` - A document that identifies an applicant\n* `IDENTITY2` - An additional document that identifies an applicant\n* `SELFIE` - Some sort of facial photo of an applicant\n* `PROOF_OF_RESIDENCE` - Proof of address, something like a utility bill (e.g. internet or electricity bills)\n* `PROOF_OF_PAYMENT` - A method of payment, like a credit card photo\n",
+        "enum": [
+          "UNDEFINED",
+          "IDENTITY",
+          "IDENTITY2",
+          "SELFIE",
+          "PROOF_OF_RESIDENCE",
+          "PROOF_OF_PAYMENT"
+        ]
+      },
+      "idDocSubType": {
+        "type": "string",
+        "enum": [
+          "UNDEFINED",
+          "FRONT_SIDE",
+          "BACK_SIDE"
+        ]
+      },
+      "docSets": {
+        "type": "object",
+        "properties": {
+          "docSets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/docSet"
+            }
+          }
+        },
+        "nullable": true
+      },
+      "docSet": {
+        "type": "object",
+        "properties": {
+          "idDocSetType": {
+            "$ref": "#/components/schemas/idDocSetType"
+          },
+          "types": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/idDocType"
+            }
+          },
+          "subTypes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/idDocSubType"
+            }
+          }
+        }
+      },
+      "applicantIdDocs": {
+        "type": "object",
+        "properties": {
+          "country": {
+            "$ref": "#/components/schemas/countryCode"
+          },
+          "includedCountries": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/countryCode"
+            }
+          },
+          "excludedCountries": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/countryCode"
+            }
+          },
+          "docSets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/docSet"
+            }
+          }
+        }
+      },
+      "countryCode": {
+        "type": "string",
+        "nullable": true,
+        "maxLength": 3,
+        "minLength": 3,
+        "description": "3-letter country code"
+      },
+      "idDoc": {
+        "type": "object",
+        "properties": {
+          "idDocType": {
+            "$ref": "#/components/schemas/idDocType"
+          },
+          "country": {
+            "$ref": "#/components/schemas/countryCode"
+          },
+          "issuedDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "number": {
+            "type": "string"
+          },
+          "dob": {
+            "type": "string",
+            "format": "date"
+          },
+          "placeOfBirth": {
+            "type": "string"
+          }
+        }
+      },
+      "applicantList": {
+        "type": "object",
+        "properties": {
+          "list": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/applicantListItem"
+                }
+              },
+              "totalItems": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      },
+      "applicantListItem": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/applicantResponse"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "requiredIdDocs": {
+                "$ref": "#/components/schemas/applicantIdDocs"
+              },
+              "review": {
+                "$ref": "#/components/schemas/review"
+              }
+            }
+          }
+        ]
+      },
+      "review": {
+        "type": "object",
+        "properties": {
+          "createDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "reviewDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expireDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "reviewResult": {
+            "$ref": "#/components/schemas/reviewResult"
+          },
+          "reviewStatus": {
+            "type": "string"
+          },
+          "notificationFailureCnt": {
+            "type": "integer"
+          }
+        }
+      },
+      "reviewResult": {
+        "type": "object",
+        "properties": {
+          "moderationComment": {
+            "type": "string",
+            "description": "A human-readable comment that can be shown to the end-user"
+          },
+          "clientComment": {
+            "type": "string",
+            "description": "A human-readable comment that should not be shown to the end-user"
+          },
+          "reviewAnswer": {
+            "$ref": "#/components/schemas/reviewAnswer"
+          },
+          "rejectLabels": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/rejectLabel"
+            }
+          },
+          "reviewRejectType": {
+            "$ref": "#/components/schemas/reviewRejectType"
+          },
+          "customTouch": {
+            "type": "boolean",
+            "nullable": true
+          }
+        }
+      },
+      "reviewAnswer": {
+        "type": "string",
+        "description": "When we are talking about verification results we typically mean these labels",
+        "enum": [
+          "UNDEFINED",
+          "GREEN",
+          "RED"
+        ]
+      },
+      "reviewResultAnswer": {
+        "type": "object",
+        "properties": {
+          "reviewAnswer": {
+            "$ref": "#/components/schemas/reviewAnswer"
+          }
+        }
+      },
+      "applicantStatus": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "inspectionId": {
+            "type": "string"
+          },
+          "applicantId": {
+            "type": "string"
+          },
+          "jobId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "createDate": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date of creation of the applicant"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date of check started"
+          },
+          "reviewResult": {
+            "$ref": "#/components/schemas/reviewResult"
+          },
+          "reviewDate": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date of check ended"
+          },
+          "reviewStatus": {
+            "$ref": "#/components/schemas/reviewStatus"
+          }
+        }
+      },
+      "rejectLabel": {
+        "type": "string",
+        "description": "* `FORGERY` - Forgery attempt has been made\n* `DOCUMENT_TEMPLATE` - Documents supplied are templates, downloaded from internet\n* `LOW_QUALITY` - Documents have low-quality that does not allow to make definitive conclusions\n* `SPAM` - An applicant has been created by mistake or just a spam user (not relevant images were supplied)\n* `NOT_DOCUMENT` - Documents supplied are not relevant for the verification procedure\n* `SELFIE_MISMATCH` - A user photo (profile image) does not match a photo on the provided documents\n* `ID_INVALID` - A document that identifies a person (like a passport or an id card) is not valid\n* `FOREIGNER` - When a client does not accept applicants from a different country or e.g. without a residence permit\n* `DUPLICATE` - This applicant was already created for this client, and duplicates are not allowed by the regulations\n* `BAD_AVATAR` - When avatar does not meet the client’s requirements\n* `WRONG_USER_REGION` - When applicants from certain regions/countries are not allowed to be registered\n* `INCOMPLETE_DOCUMENT` - Some information is missing from the document, or it’s partially visible\n* `BLACKLIST` - User if blacklisted\n* `UNSATISFACTORY_PHOTOS` - There were problems with the photos like poor quality or masked information\n* `DOCUMENT_PAGE_MISSING` - Some pages of a document are missing (if applicable)\n* `DOCUMENT_DAMAGED` - Document is damaged\n* `REGULATIONS_VIOLATIONS` - Regulations violations\n* `INCONSISTENT_PROFILE` - Like women’s name with male’s documents\n* `PROBLEMATIC_APPLICANT_DATA` - Applicant data does not match the data in the documents\n* `ADDITIONAL_DOCUMENT_REQUIRED` - Additional documents required to pass the check\n* `AGE_REQUIREMENT_MISMATCH` - Age requirement is not met (e.g. cannot rent a car to a person below 25yo)\n* `EXPERIENCE_REQUIREMENT_MISMATCH` - Not enough experience (e.g. driving experience is not enough)\n* `CRIMINAL` - The user is involved in illegal actions\n* `WRONG_ADDRESS` - The address from the documents doesn’t match the address that the user entered\n* `GRAPHIC_EDITOR` - The document has been edited by a graphical editor\n* `DOCUMENT_DEPRIVED` - The user has been deprived of the document\n* `OTHER` - Some unclassified reason\n",
+        "enum": [
+          "UNDEFINED",
+          "FORGERY",
+          "DOCUMENT_TEMPLATE",
+          "LOW_QUALITY",
+          "SPAM",
+          "NOT_DOCUMENT",
+          "SELFIE_MISMATCH",
+          "ID_INVALID",
+          "FOREIGNER",
+          "DUPLICATE",
+          "BAD_AVATAR",
+          "WRONG_USER_REGION",
+          "INCOMPLETE_DOCUMENT",
+          "BLACKLIST",
+          "UNSATISFACTORY_PHOTOS",
+          "DOCUMENT_PAGE_MISSING",
+          "DOCUMENT_DAMAGED",
+          "REGULATIONS_VIOLATIONS",
+          "INCONSISTENT_PROFILE",
+          "PROBLEMATIC_APPLICANT_DATA",
+          "ADDITIONAL_DOCUMENT_REQUIRED",
+          "AGE_REQUIREMENT_MISMATCH",
+          "EXPERIENCE_REQUIREMENT_MISMATCH",
+          "CRIMINAL",
+          "WRONG_ADDRESS",
+          "GRAPHIC_EDITOR",
+          "DOCUMENT_DEPRIVED",
+          "OTHER"
+        ]
+      },
+      "reviewRejectType": {
+        "type": "string",
+        "description": "* `FINAL` - Final reject, e.g. when a person is a fraudster, or a client does not want to accept such kind of clients in his/her system\n* `RETRY` - A reject that can be fixed, e.g. by uploading an image of better quality\n* `EXTERNAL` - When everything is fine with the submitted documents, but there are some external reasons to reject, like the avatar on the client’s site does not meet the requirements\n",
+        "enum": [
+          "UNDEFINED",
+          "FINAL",
+          "RETRY",
+          "EXTERNAL"
+        ]
+      },
+      "reviewStatus": {
+        "type": "string",
+        "description": "The reviewStatus can be one of the following\n* `init` - Initial registration has started. A client is still in progress of filling the applicant profile. Not all required documents are currently upaded.\n* `pending` - An applicant is ready to be processed\n* `queued` - The checks have been started for the applicant\n* `awaitingUser` - Waiting some additional documents from an applicant (e.g. a selfie or a better passport image)\n* `completed` - Completed, but a callback was not attempted to be sent yet\n* `completedSent` - Completed and a callback has been successfully sent\n* `completedSentFailure` - Completed, but the callback failed to be sent (logged separately in our system)\n",
+        "enum": [
+          "UNDEFINED",
+          "init",
+          "pending",
+          "queued",
+          "awaitingUser",
+          "completed",
+          "completedSent",
+          "completedSentFailure"
+        ]
+      },
+      "applicantStatusWithDocuments": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/applicantStatus"
+          },
+          "documentStatus": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/documentStatus"
+            }
+          }
+        }
+      },
+      "documentStatus": {
+        "type": "object",
+        "properties": {
+          "idDocType": {
+            "$ref": "#/components/schemas/idDocType"
+          },
+          "country": {
+            "$ref": "#/components/schemas/countryCode"
+          },
+          "imageId": {
+            "type": "string",
+            "description": "Image id which you can use to get the document"
+          },
+          "reviewResult": {
+            "$ref": "#/components/schemas/reviewResult"
+          }
+        }
+      },
+      "requiredIdDocsStatuses": {
+        "type": "object",
+        "description": "Response keys are step identifiers.",
+        "properties": {
+          "IDENTITY": {
+            "$ref": "#/components/schemas/requiredIdDocsStatus"
+          },
+          "IDENTITY2": {
+            "$ref": "#/components/schemas/requiredIdDocsStatus"
+          },
+          "SELFIE": {
+            "$ref": "#/components/schemas/requiredIdDocsStatus"
+          },
+          "PROOF_OF_RESIDENCE": {
+            "$ref": "#/components/schemas/requiredIdDocsStatus"
+          },
+          "PROOF_OF_PAYMENT": {
+            "$ref": "#/components/schemas/requiredIdDocsStatus"
+          }
+        },
+        "example": "{\n  \"IDENTITY\" : { // a step identifier\n    \"reviewResult\" : { // if exists, that means that a document was uploaded\n      \"reviewAnswer\" : \"GREEN\" // if exists, a document was checked\n    },\n    \"country\" : \"GBR\", // document country\n    \"idDocType\" : \"PASSPORT\", // specific document type for the step\n    \"imageIds\" : [ 1033571182 ] // images ids that represent a document\n  },\n  \"SELFIE\" : null // in this case, a document was not uploaded at all\n}"
+      },
+      "requiredIdDocsStatus": {
+        "type": "object",
+        "nullable": true,
+        "description": "Response fields\n* `reviewResult` - if exists, that means that a document was uploaded\n* `country` - document country\n* `idDocType` - specific document type for the step\n",
+        "properties": {
+          "reviewResult": {
+            "$ref": "#/components/schemas/reviewResultAnswer"
+          },
+          "country": {
+            "$ref": "#/components/schemas/countryCode"
+          },
+          "idDocType": {
+            "$ref": "#/components/schemas/idDocType"
+          },
+          "imageIds": {
+            "type": "array",
+            "description": "images ids that represent a document",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "idDocCreate": {
+        "type": "object",
+        "description": "Model for adding an id document.",
+        "properties": {
+          "metadata": {
+            "$ref": "#/components/schemas/idDoc"
+          },
+          "imageFile": {
+            "description": "A photo of a document",
+            "type": "object",
+            "properties": {
+              "fileName": {
+                "type": "string"
+              },
+              "contentType": {
+                "type": "string"
+              },
+              "content": {
+                "type": "string",
+                "format": "binary",
+                "description": "Image binary content",
+                "nullable": true
+              }
+            }
+          }
+        }
+      },
+      "documentContent": {
+        "type": "object",
+        "properties": {
+          "contentType": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string",
+            "format": "binary"
+          }
+        }
+      },
+      "callbackModel": {
+        "type": "object",
+        "properties": {
+          "applicantId" : {
+            "type": "string",
+            "nullable": true
+          },
+          "inspectionId" : {
+            "type": "string",
+            "nullable": true
+          },
+          "correlationId" : {
+            "type": "string",
+            "nullable": true
+          },
+          "externalUserId" : {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "type" : {
+            "type": "string",
+            "enum": [
+              "UNDEFINED",
+              "INSPECTION_REVIEW_COMPLETED",
+              "BG_CHECK_FINISHED",
+              "JOB_FINISHED"
+            ]
+          },
+          "review" : {
+            "$ref": "#/components/schemas/reviewResult"
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/resources/applicants": {
+      "post": {
+        "summary": "Creating an applicant",
+        "operationId": "CreateApplicant",
+        "description": "An applicant is an entity representing one physical person. It may have several id documents attached, like an id card or a passport. Many additional photos of different documents can be attached to the same applicant.",
+        "tags": [
+          "applicants"
+        ],
+        "requestBody": {
+          "description": "An object representing an applicant",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/applicantRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/applicantResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/resources/applicants/{applicantId}": {
+      "get": {
+        "summary": "Getting applicant data",
+        "operationId": "GetApplicant",
+        "description": "After the verification we also extract data from applicant’s id docs. To get the full structured view of an applicants you should perform the following request.",
+        "tags": [
+          "applicants"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/applicantId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/applicantList"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/resources/applicants/{applicantId}/requiredIdDocs": {
+      "post": {
+        "summary": "Changing required document set",
+        "operationId": "SetApplicantIdDocs",
+        "description": "This method patches the required document set of the applicant. To get the current required document set, call this endpoint with an empty body.",
+        "tags": [
+          "applicants"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/applicantId"
+          }
+        ],
+        "requestBody": {
+          "description": "An object representing an applicant",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/applicantIdDocs"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/applicantIdDocs"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/resources/applicants/{applicantId}/info/idDoc": {
+      "post": {
+        "summary": "Adding an id document",
+        "operationId": "AddApplicantIdDoc",
+        "description": "A method gets a multipart form: id doc JSON metadata and, optionally, a document photo. If the id doc with this type already exists, its data will be merged. Existing data will be overwritten if they also present in the new object. However, a new image will be added nonetheless. If document metadata are not known yet, just send type and a country. E.g. “PASSPORT” and “GBR”. These two fields are mandatory.",
+        "tags": [
+          "applicants"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/applicantId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/idDocCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "headers": {
+              "X-Image-Id": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "If you need to know the ‘imageId’ of the photo, you can find this information in the response header 'X-Image-Id’."
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/idDoc"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/resources/applicants/{applicantId}/info": {
+      "patch": {
+        "summary": "Changing applicant data",
+        "description": "If you want to change applicant data you can issue a PATCH request, instead of creating a new applicant which is highly discouraged. This method patches the fields in the info key of the applicant.",
+        "operationId": "ChangeApplicantData",
+        "tags": [
+          "applicants"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/applicantId"
+          },
+          {
+            "$ref": "#/components/parameters/unsetFields"
+          }
+        ],
+        "requestBody": {
+          "description": "Body must contain only those fields that you intend to change. Null fields will be ignored. If you want to unset some fields provide those in the unsetFields query parameter. Check the info attribute above for the list of supported fields. Changing applicant data will cause the applicant being switched back to the pending state.",
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/info"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "A patched info entity. Since this endpoint could be quite damaging if misused, please, check that it returns expected results on the test environment – it’s a client’s responsibility to treat their applicants well :)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/info"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/resources/applicants/{applicantId}/status": {
+      "get": {
+        "summary": "Getting applicant status (IFrame)",
+        "description": "It is recommended to use this method if you are using an IFrame.",
+        "operationId": "GettingApplicantStatusIFrame",
+        "tags": [
+          "applicants"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/applicantId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Applicant status.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/applicantStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/resources/applicants/{applicantId}/state": {
+      "get": {
+        "summary": "Getting applicant status (API)",
+        "description": "It is recommended to use this method if you not only need an applicant status, but also information about documents.",
+        "operationId": "GettingApplicantStatusAPI",
+        "tags": [
+          "applicants"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/applicantId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Applicant status with documents info.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/applicantStatusWithDocuments"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/resources/applicants/{applicantId}/status/pending": {
+      "post": {
+        "summary": "Requesting an applicant re-check",
+        "description": "You can programatically ask us to re-check an applicant in case you or your user believe that our system made a mistake, or you want to request some additional checks agreed with us in advance. To do so you should explicitly move an applicant to the pending state by performing the following request.<br/> Provide a reason if available. It will help us understand why you want to recheck an applicant. If agreed in advance what reason you will be sending, we can automate the process and e.g. perform some additional checks and notify about the results by the usual callback means. If you want to automate complains to your support, just send a user message along and we will consider it on a case-by-case basis.",
+        "operationId": "RequestApplicantRecheck",
+        "tags": [
+          "applicants"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "reason",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "description": "Status change reason"
+          },
+          {
+            "$ref": "#/components/parameters/applicantId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response. Body may be ignored."
+          }
+        }
+      }
+    },
+    "/resources/applicants/{applicantId}/requiredIdDocsStatus": {
+      "get": {
+        "summary": "Getting document images (Step 1)",
+        "description": "",
+        "operationId": "GetDocumentImagesStep1",
+        "tags": [
+          "applicants"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/applicantId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A breakdown for each step. Each step contains an array of images’ ids (could be several, e.g. if two sides were uploaded). You can get images with those ids by issuing a request described below.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/requiredIdDocsStatuses"
+                },
+                "examples": {
+                  "IDENTITY": {
+                    "value": {
+                      "reviewResult": {
+                        "value": null,
+                        "reviewAnswer": "GREEN"
+                      },
+                      "country": "GBR",
+                      "idDocType": "PASSPORT",
+                      "imageIds": [
+                        1033571182
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/resources/inspections/{inspectionId}/resources/{imageId}": {
+      "get": {
+        "summary": "Getting document images (Step 2)",
+        "description": "Get images using imageIds from previous request (Step 1).",
+        "operationId": "GetDocumentImagesStep2",
+        "tags": [
+          "applicants"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "inspectionId",
+            "description": "Inspection Id (part of an applicant).",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "nullable": false
+            }
+          },
+          {
+            "in": "path",
+            "name": "imageId",
+            "description": "Image id (see above).",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "nullable": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Binary content representing a document. The Content-Type response header more precisely describes the response mime-type.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/documentContent"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/resources/applicants/{applicantId}/blacklist": {
+      "post": {
+        "summary": "Adding an applicant to blacklist",
+        "description": "If for some reason you need to add an applicant to the blacklist, you can use this endpoint. It is necessary to add the reason for adding the applicant to the blacklist.",
+        "operationId": "AddApplicantToBlacklist",
+        "tags": [
+          "applicants"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "note",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "nullable": false
+            },
+            "description": "Reason or note for the applicant added to the blacklist (URL encoded)"
+          },
+          {
+            "$ref": "#/components/parameters/applicantId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The answer will contain the applicant added to the blacklist.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/applicantListItem"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

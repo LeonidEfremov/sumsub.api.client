@@ -1,0 +1,37 @@
+﻿{
+  "runtime": "Default",
+  "defaultVariables": "",
+  "swaggerGenerator": {
+    "fromSwagger": {
+      "url": "swagger.json"
+    }
+  },
+  "codeGenerators": {
+    "swaggerToCSharpClient": {
+      "namespace": "$(RootNamespace)",
+      "className": "Client",
+      "clientBaseClass": "ClientBase",
+      "configurationClass": "Configuration",
+      "generateClientClasses": true,
+      "generateClientInterfaces": true,
+      "generateDefaultValues": true,
+      "generateDataAnnotations": false,
+      "generateDtoTypes": true,
+      "generateSyncMethods": false,
+      "generateBaseUrlProperty": true,
+      "generateJsonMethods": false,
+      "useBaseUrl": false,
+      "injectHttpClient": true,
+      "disposeHttpClient": false,
+      "additionalNamespaceUsages": [
+        "System.Collections.Generic",
+        "System.Net.Http"
+      ],
+      "httpClientType": "HttpClient",
+      "arrayType": "IList",
+      "arrayInstanceType": "List",
+      "arrayBaseType": "List",
+      "output": "Client.generated.cs"
+    }
+  }
+}
