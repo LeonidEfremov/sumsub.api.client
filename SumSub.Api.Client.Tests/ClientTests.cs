@@ -40,6 +40,7 @@ namespace SumSub.Api.Tests
         {
             var settings = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", true, true)
+                .AddEnvironmentVariables()
                 .Build();
             var configuration = new Configuration
             {
