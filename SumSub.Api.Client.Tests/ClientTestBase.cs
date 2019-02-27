@@ -11,7 +11,7 @@ namespace SumSub.Api.Tests
     {
         private readonly IFixture _fixture;
 
-        internal readonly IClient _client;
+        internal readonly IClient Client;
 
         public ClientTestBase(IFixture fixture)
         {
@@ -26,7 +26,7 @@ namespace SumSub.Api.Tests
             };
             var httpClient = new HttpClient();
 
-            _client = new Client(configuration, httpClient);
+            Client = new Client(configuration, httpClient);
             _fixture = fixture;
         }
 
@@ -34,7 +34,7 @@ namespace SumSub.Api.Tests
         {
             var applicantRequest = _fixture.Create<ApplicantRequest>();
 
-            var applicant = await _client.CreateApplicantAsync(applicantRequest);
+            var applicant = await Client.CreateApplicantAsync(applicantRequest);
 
             return applicant;
         }
@@ -42,7 +42,7 @@ namespace SumSub.Api.Tests
         internal async Task<ApplicantIdDocs> CreateApplicantIdDocs(ApplicantResponse applicant)
         {
             var idDocs = _fixture.Create<ApplicantIdDocs>();
-            var applicantIdDocs = await _client.SetApplicantIdDocsAsync(applicant.Id, idDocs);
+            var applicantIdDocs = await Client.SetApplicantIdDocsAsync(applicant.Id, idDocs);
 
             return applicantIdDocs;
         }
@@ -62,7 +62,7 @@ namespace SumSub.Api.Tests
                     FileName = fileName
                 }
             };
-            var resultIdDoc = await _client.AddApplicantIdDocAsync(applicantId, idDocCreate);
+            var resultIdDoc = await Client.AddApplicantIdDocAsync(applicantId, idDocCreate);
 
             return resultIdDoc;
         }

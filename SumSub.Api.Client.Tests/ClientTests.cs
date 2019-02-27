@@ -21,7 +21,7 @@ namespace SumSub.Api.Tests
         public async Task ApplicantCreate()
         {
             var model = _fixture.Create<ApplicantRequest>();
-            var applicant = await _client.CreateApplicantAsync(model);
+            var applicant = await Client.CreateApplicantAsync(model);
 
             DeepAssert.Equal(applicant.Info, model.Info);
 
@@ -32,7 +32,7 @@ namespace SumSub.Api.Tests
         public async Task ApplicantGet()
         {
             var expected = await CreateApplicantAsync();
-            var actualApplicants = await _client.GetApplicantAsync(expected.Id);
+            var actualApplicants = await Client.GetApplicantAsync(expected.Id);
 
             Assert.Equal(1, actualApplicants.List.TotalItems);
             var actualApplicant = actualApplicants.List.Items.First();
@@ -53,7 +53,7 @@ namespace SumSub.Api.Tests
         {
             var applicant = await CreateApplicantAsync();
             var idDocs = _fixture.Create<ApplicantIdDocs>();
-            var actualIdDocs = await _client.SetApplicantIdDocsAsync(applicant.Id, idDocs);
+            var actualIdDocs = await Client.SetApplicantIdDocsAsync(applicant.Id, idDocs);
 
             DeepAssert.Equal(actualIdDocs, idDocs);
         }
@@ -63,7 +63,7 @@ namespace SumSub.Api.Tests
         {
             var applicant = await CreateApplicantAsync();
             var applicationIdDocs = await CreateApplicantIdDocs(applicant);
-            var actualIdDocs = await _client.SetApplicantIdDocsAsync(applicant.Id, null);
+            var actualIdDocs = await Client.SetApplicantIdDocsAsync(applicant.Id, null);
 
             DeepAssert.Equal(actualIdDocs, applicationIdDocs);
         }
@@ -86,7 +86,7 @@ namespace SumSub.Api.Tests
         {
             var applicant = await CreateApplicantAsync();
             var info = _fixture.Create<Info>();
-            var actualInfo = await _client.ChangeApplicantDataAsync(applicant.Id, null, info);
+            var actualInfo = await Client.ChangeApplicantDataAsync(applicant.Id, null, info);
 
             DeepAssert.Equal(actualInfo, info);
         }
@@ -95,7 +95,7 @@ namespace SumSub.Api.Tests
         public async Task ApplicantGetStatusIFrame()
         {
             var applicant = await CreateApplicantAsync();
-            var actualApplicant = await _client.GettingApplicantStatusIFrameAsync(applicant.Id);
+            var actualApplicant = await Client.GettingApplicantStatusIFrameAsync(applicant.Id);
 
             Assert.Equal(applicant.Id, actualApplicant.ApplicantId);
             Assert.Equal(applicant.InspectionId, actualApplicant.InspectionId);
@@ -111,7 +111,7 @@ namespace SumSub.Api.Tests
 
             await AddApplicantIdDoc(applicant.Id, idDoc, documentFilePath, documentContentType);
 
-            var actualInfo = await _client.GettingApplicantStatusAPIAsync(applicant.Id);
+            var actualInfo = await Client.GettingApplicantStatusAPIAsync(applicant.Id);
 
             Assert.Equal(applicant.Id, actualInfo.Status.ApplicantId);
             Assert.Equal(applicant.InspectionId, actualInfo.Status.InspectionId);
@@ -129,7 +129,7 @@ namespace SumSub.Api.Tests
         {
             var applicant = await CreateApplicantAsync();
 
-            await _client.RequestApplicantRecheckAsync("Because...", applicant.Id);
+            await Client.RequestApplicantRecheckAsync("Because...", applicant.Id);
         }
 
         [Theory(Skip = "Tune up fixture")]
@@ -144,7 +144,7 @@ namespace SumSub.Api.Tests
             var applicantIdDoc = await AddApplicantIdDoc(applicant.Id, idDoc, documentFilePath, documentContentType);
 
             // Step 1 - getting documents.
-            var steps = await _client.GetDocumentImagesStep1Async(applicant.Id);
+            var steps = await Client.GetDocumentImagesStep1Async(applicant.Id);
 
             Assert.NotNull(steps.IDENTITY);
 
@@ -156,7 +156,7 @@ namespace SumSub.Api.Tests
 
             // Step 2 - getting the image.
             var imageId = identityStep.ImageIds.Single();
-            var image = await _client.GetDocumentImagesStep2Async(applicant.InspectionId, imageId);
+            var image = await Client.GetDocumentImagesStep2Async(applicant.InspectionId, imageId);
 
             Assert.NotNull(image);
 
@@ -170,7 +170,7 @@ namespace SumSub.Api.Tests
         public async Task ApplicantAddToBlacklist()
         {
             var applicant = await CreateApplicantAsync();
-            var actualApplicant = await _client.AddApplicantToBlacklistAsync("Because...", applicant.Id);
+            var actualApplicant = await Client.AddApplicantToBlacklistAsync("Because...", applicant.Id);
 
             Assert.Equal(actualApplicant.Id, applicant.Id);
         }

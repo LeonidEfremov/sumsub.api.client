@@ -1,11 +1,7 @@
-﻿using System;
-
-namespace SumSub.Api
+﻿namespace SumSub.Api
 {
-    public class Configuration
+    public class Configuration : AspNet.WebApi.Configuration
     {
-        public Uri Endpoint { get; set; }
-
         public string Key { get; set; }
     }
 }

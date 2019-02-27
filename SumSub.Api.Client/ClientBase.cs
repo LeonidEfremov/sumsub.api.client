@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace SumSub.Api
 {
-    public abstract class ClientBase
+    public abstract class ClientBase : AspNet.WebApi.ClientBase
     {
         private static readonly Regex AddApplicantIdDocRegEx = new Regex(@"^resources\/applicants\/[a-z0-9]+\/info\/idDoc",
             RegexOptions.Compiled & RegexOptions.IgnoreCase & RegexOptions.CultureInvariant);
@@ -15,9 +15,9 @@ namespace SumSub.Api
         private static readonly Regex GetResourceRegEx = new Regex(@"^\/resources\/inspections\/[a-z0-9]+\/resources\/[a-z0-9]+",
             RegexOptions.Compiled & RegexOptions.IgnoreCase & RegexOptions.CultureInvariant);
 
-        internal readonly Configuration Configuration;
+        internal new readonly Configuration Configuration;
 
-        internal ClientBase(Configuration configuration)
+        internal ClientBase(Configuration configuration) : base(configuration)
         {
             Configuration = configuration;
         }
