@@ -1,138 +1,178 @@
-﻿using AutoFixture;
-using Microsoft.Extensions.Configuration;
-using SumSub.Api.Tests.Extensions;
+using AutoFixture;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
+using Xunit;
+using Xunit.Asserts.Compare;
 
 namespace SumSub.Api.Tests
 {
-    public partial class ClientTests
+    public class ClientTests : ClientTestBase, IClassFixture<Fixtures>
     {
-        private readonly List<string> _countrycode = new List<string>
-            {
-                "ABW", "AFG", "AGO", "AIA", "ALA", "ALB", "AND", "ARE", "ARG", "ARM", "ASM", "ATA", "ATF", "ATG", "AUS",
-                "AUT", "AZE", "BDI", "BEL", "BEN", "BES", "BFA", "BGD", "BGR", "BHR", "BHS", "BIH", "BLM", "BLR", "BLZ",
-                "BMU", "BOL", "BRA", "BRB", "BRN", "BTN", "BVT", "BWA", "CAF", "CAN", "CCK", "CHE", "CHL", "CHN", "CIV",
-                "CMR", "COD", "COG", "COK", "COL", "COM", "CPV", "CRI", "CUB", "CUW", "CXR", "CYM", "CYP", "CZE", "DEU",
-                "DJI", "DMA", "DNK", "DOM", "DZA", "ECU", "EGY", "ERI", "ESH", "ESP", "EST", "ETH", "FIN", "FJI", "FLK",
-                "FRA", "FRO", "FSM", "GAB", "GBR", "GEO", "GGY", "GHA", "GIB", "GIN", "GLP", "GMB", "GNB", "GNQ", "GRC",
-                "GRD", "GRL", "GTM", "GUF", "GUM", "GUY", "HKG", "HMD", "HND", "HRV", "HTI", "HUN", "IDN", "IMN", "IND",
-                "IOT", "IRL", "IRN", "IRQ", "ISL", "ISR", "ITA", "JAM", "JEY", "JOR", "JPN", "KAZ", "KEN", "KGZ", "KHM",
-                "KIR", "KNA", "KOR", "KWT", "LAO", "LBN", "LBR", "LBY", "LCA", "LIE", "LKA", "LSO", "LTU", "LUX", "LVA",
-                "MAC", "MAF", "MAR", "MCO", "MDA", "MDG", "MDV", "MEX", "MHL", "MKD", "MLI", "MLT", "MMR", "MNE", "MNG",
-                "MNP", "MOZ", "MRT", "MSR", "MTQ", "MUS", "MWI", "MYS", "MYT", "NAM", "NCL", "NER", "NFK", "NGA", "NIC",
-                "NIU", "NLD", "NOR", "NPL", "NRU", "NZL", "OMN", "PAK", "PAN", "PCN", "PER", "PHL", "PLW", "PNG", "POL",
-                "PRI", "PRK", "PRT", "PRY", "PSE", "PYF", "QAT", "REU", "ROU", "RUS", "RWA", "SAU", "SDN", "SEN", "SGP",
-                "SGS", "SHN", "SJM", "SLB", "SLE", "SLV", "SMR", "SOM", "SPM", "SRB", "SSD", "STP", "SUR", "SVK", "SVN",
-                "SWE", "SWZ", "SXM", "SYC", "SYR", "TCA", "TCD", "TGO", "THA", "TJK", "TKL", "TKM", "TLS", "TON", "TTO",
-                "TUN", "TUR", "TUV", "TWN", "TZA", "UGA", "UKR", "UMI", "URY", "USA", "UZB", "VAT", "VCT", "VEN", "VGB",
-                "VIR", "VNM", "VUT", "WLF", "WSM", "YEM", "ZAF", "ZMB", "ZWE"
-            };
+        private readonly IFixture _fixture;
 
-        private IClient _client;
-        private Fixture _fixture;
-
-        public ClientTests()
+        public ClientTests(Fixtures fixtures) : base(fixtures.Fixture)
         {
-            var settings = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json", true, true)
-                .AddEnvironmentVariables()
-                .Build();
-            var configuration = new Configuration
-            {
-                Endpoint = new Uri(settings.GetSection("sumsub:endpoint").Value),
-                Key = settings.GetSection("sumsub:key").Value
-            };
-            var httpClient = new HttpClient();
-
-            _client = new Client(configuration, httpClient);
-
-            _fixture = CreateFixture();
+            _fixture = fixtures.Fixture;
         }
 
-        private Fixture CreateFixture()
+        [Fact]
+        public async Task ApplicantCreate()
         {
-            var fixture = new Fixture();
-            var rand = new Random();
-            var idDocTypes = Enum.GetValues(typeof(IdDocType)).Cast<IdDocType>().Where(_ => _ != IdDocType.UNDEFINED).ToList();
-            var idDocSetTypes = Enum.GetValues(typeof(IdDocSetType)).Cast<IdDocSetType>().Where(_ => _ != IdDocSetType.UNDEFINED).ToList();
-            var idDocSubTypes = Enum.GetValues(typeof(IdDocSubType)).Cast<IdDocSubType>().Where(_ => _ != IdDocSubType.UNDEFINED).ToList();
+            var model = _fixture.Create<ApplicantRequest>();
+            var applicant = await _client.CreateApplicantAsync(model);
 
-            fixture.Customize<Info>(c => c
-                .With(i => i.Country, _countrycode.RandomElement())
-                .With(_ => _.Dob, DateTime.Now.Date.AddDays(-rand.Next(20, 40)))
-            );
+            DeepAssert.Equal(applicant.Info, model.Info);
 
-            fixture.Customize<Address>(c => c
-                .With(i => i.Country, _countrycode.RandomElement())
-                .With(i => i.StartDate, DateTime.Now.Date.AddDays(-rand.Next(20, 40)))
-                .With(i => i.EndDate, DateTime.Now.Date.AddDays(-rand.Next(20, 40)))
-            );
-
-            fixture.Customize<ApplicantIdDocs>(c => c
-                .With(_ => _.Country, _countrycode.RandomElement())
-                .With(_ => _.IncludedCountries, new List<string> { _countrycode.RandomElement() })
-                .With(_ => _.ExcludedCountries, new List<string> { _countrycode.RandomElement() })
-            );
-
-            fixture.Customize<IdDoc>(c => c
-                .With(_ => _.Country, _countrycode.RandomElement())
-                .With(_ => _.Dob, DateTime.Now.Date.AddDays(-rand.Next(20, 40)))
-                .With(_ => _.IssuedDate, DateTime.Now.Date.AddDays(-rand.Next(20, 40)))
-                .With(_ => _.IdDocType, idDocTypes.RandomElement())
-            );
-
-            fixture.Customize<DocSet>(c => c
-                .With(_ => _.IdDocSetType, idDocSetTypes.RandomElement())
-            );
-
-            fixture.Customize<ApplicantRequest>(c => c
-                .With(_ => _.RequiredIdDocs, (DocSets)null)
-            );
-
-            return fixture;
+            Assert.Equal("test-api", applicant.Env);
         }
 
-
-        private async Task<ApplicantResponse> CreateApplicantAsync()
+        [Fact]
+        public async Task ApplicantGet()
         {
-            var applicantRequest = _fixture.Create<ApplicantRequest>();
+            var expected = await CreateApplicantAsync();
+            var actualApplicants = await _client.GetApplicantAsync(expected.Id);
 
-            var applicant = await _client.CreateApplicantAsync(applicantRequest);
+            Assert.Equal(1, actualApplicants.List.TotalItems);
+            var actualApplicant = actualApplicants.List.Items.First();
 
-            return applicant;
+            Assert.Equal(expected.Id, actualApplicant.Id);
+            Assert.Equal(expected.ClientId, actualApplicant.ClientId);
+            Assert.Equal(expected.CreatedAt, actualApplicant.CreatedAt);
+            Assert.Equal(expected.Env, actualApplicant.Env);
+            Assert.Equal(expected.ExternalUserId, actualApplicant.ExternalUserId);
+            Assert.Equal(expected.JobId, actualApplicant.JobId);
+            Assert.Equal(expected.InspectionId, actualApplicant.InspectionId);
+
+            DeepAssert.Equal(expected.Info, actualApplicant.Info);
         }
 
-        private async Task<ApplicantIdDocs> CreateApplicantIdDocs(ApplicantResponse applicant)
+        [Fact(Skip = "Tune up fixture")]
+        public async Task ApplicantSetIdDocs()
         {
+            var applicant = await CreateApplicantAsync();
             var idDocs = _fixture.Create<ApplicantIdDocs>();
-            var applicantIdDocs = await _client.SetApplicantIdDocsAsync(applicant.Id, idDocs);
+            var actualIdDocs = await _client.SetApplicantIdDocsAsync(applicant.Id, idDocs);
 
-            return applicantIdDocs;
+            DeepAssert.Equal(actualIdDocs, idDocs);
         }
 
-        private async Task<IdDoc> AddApplicantIdDoc(string applicantId, IdDoc idDoc, string documentFilePath, string documentContentType)
+        [Fact(Skip = "Tune up fixture")]
+        public async Task ApplicantGetIdDocs()
         {
-            var fileName = Path.GetFileName(documentFilePath);
-            var bytes = File.ReadAllBytes(documentFilePath);
-            var content = Convert.ToBase64String(bytes);
-            var idDocCreate = new IdDocCreate
-            {
-                Metadata = idDoc,
-                ImageFile = new ImageFile
-                {
-                    Content = content,
-                    ContentType = documentContentType,
-                    FileName = fileName
-                }
-            };
-            var resultIdDoc = await _client.AddApplicantIdDocAsync(applicantId, idDocCreate);
+            var applicant = await CreateApplicantAsync();
+            var applicationIdDocs = await CreateApplicantIdDocs(applicant);
+            var actualIdDocs = await _client.SetApplicantIdDocsAsync(applicant.Id, null);
 
-            return resultIdDoc;
+            DeepAssert.Equal(actualIdDocs, applicationIdDocs);
+        }
+
+        [Theory(Skip = "Tune up fixture")]
+        [InlineData("./Files/crazy_homer.jpg", "image/jpeg")]
+        [InlineData("./Files/homer_doughnut.png", "image/png")]
+        [InlineData("./Files/csharp_test.pdf", "application/pdf")]
+        public async Task ApplicantAddIdDocs(string documentFilePath, string documentContentType)
+        {
+            var applicant = await CreateApplicantAsync();
+            var idDoc = _fixture.Create<IdDoc>();
+            var actualIdDoc = await AddApplicantIdDoc(applicant.Id, idDoc, documentFilePath, documentContentType);
+
+            DeepAssert.Equal(actualIdDoc, idDoc);
+        }
+
+        [Fact]
+        public async Task ApplicantChangeInfo()
+        {
+            var applicant = await CreateApplicantAsync();
+            var info = _fixture.Create<Info>();
+            var actualInfo = await _client.ChangeApplicantDataAsync(applicant.Id, null, info);
+
+            DeepAssert.Equal(actualInfo, info);
+        }
+
+        [Fact]
+        public async Task ApplicantGetStatusIFrame()
+        {
+            var applicant = await CreateApplicantAsync();
+            var actualApplicant = await _client.GettingApplicantStatusIFrameAsync(applicant.Id);
+
+            Assert.Equal(applicant.Id, actualApplicant.ApplicantId);
+            Assert.Equal(applicant.InspectionId, actualApplicant.InspectionId);
+            Assert.Equal(applicant.JobId, actualApplicant.JobId);
+        }
+
+        [Theory]
+        [InlineData("./Files/crazy_homer.jpg", "image/jpeg")]
+        public async Task ApplicantGetStatusApi(string documentFilePath, string documentContentType)
+        {
+            var applicant = await CreateApplicantAsync();
+            var idDoc = _fixture.Create<IdDoc>();
+
+            await AddApplicantIdDoc(applicant.Id, idDoc, documentFilePath, documentContentType);
+
+            var actualInfo = await _client.GettingApplicantStatusAPIAsync(applicant.Id);
+
+            Assert.Equal(applicant.Id, actualInfo.Status.ApplicantId);
+            Assert.Equal(applicant.InspectionId, actualInfo.Status.InspectionId);
+            Assert.Equal(applicant.JobId, actualInfo.Status.JobId);
+            Assert.Equal(1, actualInfo.DocumentStatus.Count);
+
+            var actualDoc = actualInfo.DocumentStatus.First();
+
+            Assert.Equal(idDoc.IdDocType, actualDoc.IdDocType);
+            Assert.Equal(idDoc.Country, actualDoc.Country);
+        }
+
+        [Fact]
+        public async Task ApplicantRequestRecheck()
+        {
+            var applicant = await CreateApplicantAsync();
+
+            await _client.RequestApplicantRecheckAsync("Because...", applicant.Id);
+        }
+
+        [Theory(Skip = "Tune up fixture")]
+        [InlineData("./Files/crazy_homer.jpg", "image/jpeg")]
+        [InlineData("./Files/homer_doughnut.png", "image/png")]
+        [InlineData("./Files/csharp_test.pdf", "application/pdf")]
+        public async Task ApplicantGetDocumentImagesTest(string documentFilePath, string documentContentType)
+        {
+            var applicant = await CreateApplicantAsync();
+            var idDoc = _fixture.Create<IdDoc>();
+            idDoc.IdDocType = IdDocType.PASSPORT;
+            var applicantIdDoc = await AddApplicantIdDoc(applicant.Id, idDoc, documentFilePath, documentContentType);
+
+            // Step 1 - getting documents.
+            var steps = await _client.GetDocumentImagesStep1Async(applicant.Id);
+
+            Assert.NotNull(steps.IDENTITY);
+
+            var identityStep = steps.IDENTITY;
+
+            Assert.Equal(applicantIdDoc.IdDocType, identityStep.IdDocType);
+            Assert.Equal(applicantIdDoc.Country, identityStep.Country);
+            Assert.Equal(1, identityStep.ImageIds.Count);
+
+            // Step 2 - getting the image.
+            var imageId = identityStep.ImageIds.Single();
+            var image = await _client.GetDocumentImagesStep2Async(applicant.InspectionId, imageId);
+
+            Assert.NotNull(image);
+
+            var expectedBytes = File.ReadAllBytes(documentFilePath);
+            var actualBytes = Convert.FromBase64String(image.Content);
+
+            Assert.Equal(expectedBytes, actualBytes);
+        }
+
+        [Fact]
+        public async Task ApplicantAddToBlacklist()
+        {
+            var applicant = await CreateApplicantAsync();
+            var actualApplicant = await _client.AddApplicantToBlacklistAsync("Because...", applicant.Id);
+
+            Assert.Equal(actualApplicant.Id, applicant.Id);
         }
     }
 }

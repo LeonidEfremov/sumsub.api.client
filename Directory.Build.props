@@ -10,7 +10,7 @@
   </PropertyGroup>
   <PropertyGroup Label="Package">
     <ApplicationVersion>$(Version)</ApplicationVersion>
-    <VersionPrefix>1.2.1</VersionPrefix>
+    <VersionPrefix>1.2.2</VersionPrefix>
     <PackageReleaseNotes>Full Sum&amp;Sub API support.</PackageReleaseNotes>
     <VersionSuffix>$(VersionSuffix)</VersionSuffix>
     <PackageOutputPath>$(SolutionDir).packages</PackageOutputPath>
