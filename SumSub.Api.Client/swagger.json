@@ -724,7 +724,6 @@
           },
           "externalUserId" : {
             "type": "string",
-            "format": "uuid",
             "nullable": true
           },
           "type" : {
