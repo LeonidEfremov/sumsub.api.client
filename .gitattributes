@@ -4,12 +4,6 @@
 * text=auto
 
 ###############################################################################
-# Explicitly declare text files you want to always be normalized and converted
-# to native line endings on checkout.
-###############################################################################
-*.sh text eol=lf
-
-###############################################################################
 # Set default behavior for command prompt diff.
 #
 # This is need for earlier builds of msysgit that does not have it on by

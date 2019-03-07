@@ -2,30 +2,39 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build",
-            "command": "dotnet",
-            "type": "process",
             "group": {
                 "kind": "build",
                 "isDefault": true
             },
-            "args": [
-                "build",
-                "${workspaceFolder}"
-            ],
-            "problemMatcher": "$msCompile"
-        },
-        {
-            "label": "test",
+            "label": "build",
             "command": "dotnet",
             "type": "process",
+            "args": [
+                "build"
+            ],
+            "problemMatcher": "$msCompile",
+            "presentation": {
+                "echo": true,
+                "reveal": "silent",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
+        },
+        {
             "group": {
                 "kind": "test",
                 "isDefault": true
             },
+            "label": "test",
+            "command": "dotnet",
+            "type": "process",
             "args": [
                 "test",
-                "${workspaceFolder}"
+                "/p:CollectCoverage=true",
+                "/p:CoverletOutputFormat=opencover",
+                "/p:Exclude=[xunit*]*%2c[*Tests]*"
             ],
             "problemMatcher": "$msCompile"
         }
