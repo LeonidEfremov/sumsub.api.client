@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <RootNamespace>SumSub.Api</RootNamespace>
@@ -8,7 +8,7 @@
     <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="2.2.0" />
     <PackageReference Include="AspNet.WebApi.Client" Version="1.5.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
-    <PackageReference Include="NSwag.MSBuild" Version="13.18.2" PrivateAssets="all" />
+    <PackageReference Include="NSwag.MSBuild" Version="13.18.5" PrivateAssets="all" />
   </ItemGroup>
   <Target Name="TempFiles" BeforeTargets="NSwag">
     <Touch Files="./Client.generated.cs" AlwaysCreate="true" />
